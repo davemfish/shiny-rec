@@ -51,26 +51,26 @@ print("start function")
 ## Its called inside LoadONE() OR LoadTWO() - comparison
 LoadSpace <- function(inputX){
   ws <- inputX
-  #ce <- read.csv(file.path(ws, "outputs/coastal_exposure/coastal_exposure.csv"), header=T)
-  ce <- read.table(file.path(ws, "outputs/coastal_exposure/coastal_exposure.csv"), sep=",", colClasses="numeric", header=T)
-  aoi <- raster(file.path(ws, "intermediate/00_preprocessing/00_PRE_aoi.tif"))
-  points.wgs84 <- rgdal::project(as.matrix(ce[,1:2]), proj=projection(aoi), inv=T)
-  ce <- cbind(points.wgs84, ce)
-  names(ce)[1:2] <- c("lon", "lat")
-  print("loaded csv")
-  return(ce)
+  unzip(Sys.glob(file.path(ws, "results*.zip")), exdir=ws, overwrite=T)
+  grid <- readOGR(dsn=ws, layer="grid")
+  #aoi <- raster(file.path(ws, "intermediate/00_preprocessing/00_PRE_aoi.tif"))
+  #points.wgs84 <- rgdal::project(as.matrix(ce[,1:2]), proj=projection(aoi), inv=T)
+  if (grepl("\\+proj=longlat\\s+\\+datum=WGS84", projection(grid))){
+    print("Checking AOI CRS...OK")
+  } else {
+    print("....transforming to longlat WGS84")
+    grid.wgs84 <- spTransform(grid, CRS=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+  }
+  #   ce <- cbind(points.wgs84, ce)
+  #   names(ce)[1:2] <- c("lon", "lat")
+  #   print("loaded csv")
+  return(grid.wgs84)
 }
 
 L0 <- Leaflet$new()
 L0$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
 L0$setView(c(0, 0), 1)  
-L0$set(width = 550, height = 450)
-
-# Initialize inset Leaflet Map
-L3 <- Leaflet$new()
-#L1$addAssets(jshead = "https://github.com/turban/Leaflet.Sync/blob/master/L.Map.Sync.js")
-L3$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
-L3$set(width = 550, height = 450) 
+L0$set(width = 550, height = 450) 
 
 ###### Server Function ##############
 shinyServer(function(input, output, session) {
@@ -93,8 +93,8 @@ shinyServer(function(input, output, session) {
       return(NULL)
     
     isolate({
-      ce <- LoadSpace(input$InVEST)
-      return(ce)
+      grid <- LoadSpace(input$InVEST)
+      return(grid)
     })
   })
   
@@ -139,7 +139,7 @@ shinyServer(function(input, output, session) {
     #isolate({
     #input$upload
     ws <- input$InVEST
-    logfile <- readLines(con=file.path(ws, list.files(path=ws, pattern=glob2rx("coastal_vulnerability-log*.txt"))), n=-1)
+    logfile <- readLines(con=file.path(ws, list.files(path=ws, pattern=glob2rx("recreation_client-log*.txt"))), n=-1)
     blanks <- which(logfile=="")
     log <- logfile[1:(min(blanks) - 1)]
     print("loaded log")
@@ -170,12 +170,12 @@ shinyServer(function(input, output, session) {
       return(NULL)
     isolate({
       print("updating select")
-      ce <- loadONE()
+      grid <- loadONE()
       
       updateSelectInput(session, "mapvar2",
                         label = "Map Layer",
-                        choices = names(ce),
-                        selected = "coastal_exposure"
+                        choices = names(grid@data)[2:5],
+                        selected = "usdyav"
       )
     })
   })
@@ -193,16 +193,22 @@ shinyServer(function(input, output, session) {
       return(NULL)
     
     isolate({
-      ce <- loadONE()
+      grid <- loadONE()
+      dat <- grid@data
       #print(class(ce))
       #print(input$mapvar2)
-      cols <- brewer.pal(5, "YlOrRd")[as.numeric(cut(ce[[input$mapvar2]], breaks=5))]
+      cols <- brewer.pal(8, "BuPu")[as.numeric(cut(dat[[input$mapvar2]], breaks=8))]
       #print(head(cols))
       return(cols)
     })
   })
   
   
+  ## Initialize first Leaflet Map
+  # L1 <- Leaflet$new()
+  # #L1$addAssets(jshead = "https://github.com/turban/Leaflet.Sync/blob/master/L.Map.Sync.js")
+  # L1$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
+  # L1$set(width = 550, height = 450) 
   
   ## PLOT: def function to add points and set view of leaflet
   ## calls to loadONE(), getCol()
@@ -215,29 +221,41 @@ shinyServer(function(input, output, session) {
     if (is.null(input$mapvar2))
       return(NULL)
     print("plotMap past NULLs")
-    ce <- loadONE()
-    ce$col <- getCol()
-    tmp.ce <- apply(ce, 1, as.list)
-    tmp.ce <- lapply(tmp.ce, function(x){
+    grid <- loadONE()
+    grid@data <- grid@data[,1:5]
+    grid@data$col <- getCol()
+
+    if (!file.exists(file.path(".", "tmpdir"))){
+      tmppath <- dir.create(file.path(".", "tmpdir"))
+    } else {
+      tmppath <- file.path(".", "tmpdir")
+    }
+    jsonfile <- tempfile("grid", tmpdir=tmppath)
+    print("WRITING geoJSON")
+    writeOGR(grid, jsonfile, layer="", driver="GeoJSON", overwrite_layer=T)
+    print("READING geoJSON")
+    grid.list <- RJSONIO::fromJSON("./tmpdir/gridjson.geojson")
+    grid.list[[3]] <- lapply(grid.list[[3]], function(x){
       mat <- as.matrix(unlist(x))
-      mat <- as.matrix(mat[!(rownames(mat) %in% c("x", "y", "array.row", "array.col", "col")),])
+      mat <- as.matrix(mat[(grep("geometry*", rownames(mat))*-1),])
       x$popup <- hwrite(mat)
       return(x)
     })
-    L0$setView(c(ce$lat[10], ce$lon[10]), 10)
-    L0$geoJson(toGeoJSON(tmp.ce, lat='lat', lon='lon'), 
-               onEachFeature = '#! function(feature, layer){
-               layer.bindPopup(feature.properties.popup)
-  } !#',
-               pointToLayer =  "#! function(feature, latlng){
-               return L.circleMarker(latlng, {
-               radius: 4,
-               fillColor: feature.properties.col || 'white',    
-               color: '#000',
-               weight: 1,
-               fillOpacity: 0.8
-               })
-} !#")
+    L0$setView(c(mean(c(bbox(grid)[2,1], bbox(grid)[2,2])),mean(c(bbox(grid)[1,1], bbox(grid)[1,2])), 8))
+    L0$geoJson(grid.list, 
+           onEachFeature = "#! function(feature, layer){
+            layer.bindPopup(feature.popup)
+           } !#",
+           style="#! function style(feature){
+            return {
+              fill:true,
+              fillColor: feature.properties.col,
+              fillOpacity:0.7,
+              color:'white',
+              weight:1
+            };
+           } !#"
+    )
     return(L0)
     })
   
@@ -254,24 +272,7 @@ shinyServer(function(input, output, session) {
   
   
   ## PLOT: render array of histograms
-  output$hist2 <- renderPlot({
-    if (input$upload == 0){
-      return(NULL)
-    }
-    ce <- loadONE()
-    pts <- ce[,7:ncol(ce)]
-    plotpts <- melt(pts)
-    gg.hist <- ggplot(plotpts) + 
-      geom_bar(aes(x=value, y=..count.., fill=cut(value, c(0,1,2,3,4,5), include.lowest=T)), binwidth=.5, color="white") +
-      facet_wrap("variable", nrow=ceiling(sqrt(ncol(pts))), ncol=ceiling(sqrt(ncol(pts)))) +
-      scale_fill_brewer(palette="YlOrRd", type="qual") +
-      scale_x_continuous(breaks=c(0:5)) +
-      xlim(-0.1, 5.1) +
-      ylab("# of Coastline Segments") +
-      xlab("Vulnerability Index") +
-      th.bar
-    print(gg.hist)
-  })
+
   
   ## COMP: 
   ## Initialize 2nd leaflet map
@@ -440,7 +441,6 @@ shinyServer(function(input, output, session) {
       print(names(df))
       print(input$tablenames)
       df <- format(df[,input$tablenames], nsmall=3, digits=3)
-      df <- cbind(ZoomTo = paste('<a class="go-map" href="" data-lat="', df$lat, '" data-lon="', df$lon, '"><i class="fa fa-crosshairs"></i></a>', sep=""), df)
     })
     #print()
     return(df)
@@ -454,16 +454,5 @@ shinyServer(function(input, output, session) {
     filename = paste('data-', '.csv', sep=''),
     content = function(file) {write.csv(FormatTable(), file)}
   )
-  
-  
-  
-  output$insetmap <- renderPlot({
-    #  return(L3)
-    xx=c(-180,180)
-    yy=c(-90,90)
-    print(input$goto)
-    plot(x=xx, y=yy)
-    #   plot(input$goto$lon, input$goto$lat, col="red", add=T)
-  })
   
   })

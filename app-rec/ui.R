@@ -20,9 +20,8 @@ shinyUI(#fluidPage(
                           #selectInput("InVEST", label="Choose InVEST workspace", choices=getdir(), selected=NULL),
                           h4("Select an InVEST run to visualize"),
                           p("Browse to the directory you defined as your workspace when you ran the InVEST model. 
-                            Your workspace contains these 3 subfolders:"),
-                          p("     'intermediate'"),
-                          p("     'outputs'"),
+                            Your workspace contains these 2 subfolders:"),
+                          p("     'results-year-mn-dy--hh_mm_ss'"),
                           p("     'tmp'"),
                           textInput("InVEST", "", "Enter Workspace Path"),
                           actionButton("ChooseDir", "Browse"),
@@ -49,16 +48,11 @@ shinyUI(#fluidPage(
                       sidebarLayout(
                         sidebarPanel(
                           uiOutput("tablenames"),
-                          br()
-                          #downloadButton("downloadCSV", label = "Download CSV", class = NULL),
-                          #chartOutput("insetmap", 'leaflet')
+                          br(),
+                          downloadButton("downloadCSV", label = "Download CSV", class = NULL)
                         ),
                         mainPanel(
-                          #uiOutput("tablenames"),
-                          dataTableOutput("printtable"),
-                          plotOutput("insetmap")
-                          #chartOutput("insetmap", 'leaflet')
-                        )
+                          dataTableOutput("printtable"))
                       )
              ),
              tabPanel("Compare Scenarios",
