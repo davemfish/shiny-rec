@@ -6,66 +6,52 @@ library(rgdal)
 library(raster)
 library(RColorBrewer)
 library(hwriter)
+library(foreign)
+library(RJSONIO)
 
 
 
 
-### ggplot theme ####
-th.bar <- theme(panel.background = element_rect(fill="white"), 
-                axis.text.y=element_text(size=11),
-                axis.text.x=element_text(size=11),
-                axis.title.x=element_text(size=14),
-                axis.title.y=element_text(size=14),
-                strip.text=element_text(size=11), 
-                strip.background=element_blank(), 
-                panel.border = element_rect(color="black", fill=NA), 
-                #panel.grid.minor.x=element_line(size=.2, color="gray", linetype="dashed"), 
-                panel.grid.major.y=element_line(size=.4, color="gray", linetype="dashed"),
-                panel.grid.minor.y=element_blank(),
-                panel.grid.minor.x=element_blank(),
-                panel.grid.major.x=element_blank(),
-                #legend.text=element_blank(),
-                legend.position="none")
-
-th.hist <- theme(panel.background = element_rect(fill="white"), 
-                 axis.text.y=element_text(size=12),
-                 axis.text.x=element_text(size=12),
-                 #axis.title.x=element_blank(),
-                 #axis.title.y=element_blank(),
-                 #strip.text=element_blank(), 
-                 strip.background=element_blank(), 
-                 panel.border = element_rect(color="black", fill=NA), 
-                 #panel.grid.minor.x=element_line(size=.2, color="gray", linetype="dashed"), 
-                 panel.grid.major.y=element_blank(),
-                 panel.grid.minor.y=element_blank(),
-                 panel.grid.minor.x=element_blank(),
-                 panel.grid.major.x=element_blank(),
-                 #legend.text=element_blank(),
-                 legend.position="none")
+# ### ggplot theme ####
+# th.bar <- theme(panel.background = element_rect(fill="white"), 
+#                 axis.text.y=element_text(size=11),
+#                 axis.text.x=element_text(size=11),
+#                 axis.title.x=element_text(size=14),
+#                 axis.title.y=element_text(size=14),
+#                 strip.text=element_text(size=11), 
+#                 strip.background=element_blank(), 
+#                 panel.border = element_rect(color="black", fill=NA), 
+#                 #panel.grid.minor.x=element_line(size=.2, color="gray", linetype="dashed"), 
+#                 panel.grid.major.y=element_line(size=.4, color="gray", linetype="dashed"),
+#                 panel.grid.minor.y=element_blank(),
+#                 panel.grid.minor.x=element_blank(),
+#                 panel.grid.major.x=element_blank(),
+#                 #legend.text=element_blank(),
+#                 legend.position="none")
+# 
+# th.hist <- theme(panel.background = element_rect(fill="white"), 
+#                  axis.text.y=element_text(size=12),
+#                  axis.text.x=element_text(size=12),
+#                  #axis.title.x=element_blank(),
+#                  #axis.title.y=element_blank(),
+#                  #strip.text=element_blank(), 
+#                  strip.background=element_blank(), 
+#                  panel.border = element_rect(color="black", fill=NA), 
+#                  #panel.grid.minor.x=element_line(size=.2, color="gray", linetype="dashed"), 
+#                  panel.grid.major.y=element_blank(),
+#                  panel.grid.minor.y=element_blank(),
+#                  panel.grid.minor.x=element_blank(),
+#                  panel.grid.major.x=element_blank(),
+#                  #legend.text=element_blank(),
+#                  legend.position="none")
 
 
 print("start function")
 
 
-## This function loads and processes the coastal_exposure.csv
+
 ## Its called inside LoadONE() OR LoadTWO() - comparison
-LoadSpace <- function(inputX){
-  ws <- inputX
-  unzip(Sys.glob(file.path(ws, "results*.zip")), exdir=ws, overwrite=T)
-  grid <- readOGR(dsn=ws, layer="grid")
-  #aoi <- raster(file.path(ws, "intermediate/00_preprocessing/00_PRE_aoi.tif"))
-  #points.wgs84 <- rgdal::project(as.matrix(ce[,1:2]), proj=projection(aoi), inv=T)
-  if (grepl("\\+proj=longlat\\s+\\+datum=WGS84", projection(grid))){
-    print("Checking AOI CRS...OK")
-  } else {
-    print("....transforming to longlat WGS84")
-    grid.wgs84 <- spTransform(grid, CRS=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
-  }
-  #   ce <- cbind(points.wgs84, ce)
-  #   names(ce)[1:2] <- c("lon", "lat")
-  #   print("loaded csv")
-  return(grid.wgs84)
-}
+
 
 L0 <- Leaflet$new()
 L0$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
@@ -75,28 +61,76 @@ L0$set(width = 550, height = 450)
 ###### Server Function ##############
 shinyServer(function(input, output, session) {
   
-  ## Browse to directory
-  observe({ 
-    if (input$ChooseDir == 0)
-      return(NULL)
-    
-    dirname <- choose.dir()
-    #str(input$ChooseDir)
-    isolate({
-      updateTextInput(session, "InVEST", "InVEST Workspace", value=dirname)
-    })
-  })
-  
-  ## def function to upload results from dir
-  loadONE <- reactive({ 
+  ## Read InVEST logfile.txt
+  loadLOG <- reactive({
     if (input$upload == 0)
       return(NULL)
     
-    isolate({
-      grid <- LoadSpace(input$InVEST)
-      return(grid)
-    })
+    #isolate({
+    #input$upload
+    #ws <- input$InVEST
+    logfile <- readLines(con=file.path(input$log$datapath), n=-1)
+    blanks <- which(logfile=="")
+    logtable <- logfile[1:(min(blanks) - 1)]
+    sessionline <- logfile[grep(logfile, pattern="Assigned server session id")]
+    sessid <- sub(sessionline, pattern=".*Assigned server session id ", replacement="")
+    sessid <- sub(sessid, pattern="\\.", replacement="")
+    print("loaded log")
+    print(logtable)
+    return(list(sessid, logtable))
+    #})
+    
   })
+  
+  LoadSpace <- function(){
+    sessid <- loadLOG()[[1]]
+    #sessid <- "jvv94vs9fl7pflqmkd91aksm61"
+    ws <- file.path("http://ncp-skookum.stanford.edu/~woodsp", sessid)
+    #unzip(Sys.glob(file.path(ws, "results*.zip")), exdir=ws, overwrite=T)
+    atts <- read.csv(file.path(ws, "grid.csv"))
+    geom <- fromJSON(file.path(ws, "grid.geojson"))
+    aoijson <- fromJSON(file.path(ws, "aoi.geojson"))
+    aoibbox <- aoijson[[2]][[1]]$bbox
+    center <- c(mean(aoibbox[2], aoibbox[4]), mean(aoibbox[1], aoibbox[3]))
+    zoom <- 8
+    view <- list(center=center, zoom=zoom)
+    #grid <- readOGR(dsn=ws, layer="grid")
+    #aoi <- raster(file.path(ws, "intermediate/00_preprocessing/00_PRE_aoi.tif"))
+    #points.wgs84 <- rgdal::project(as.matrix(ce[,1:2]), proj=projection(aoi), inv=T)
+    #   if (grepl("\\+proj=longlat\\s+\\+datum=WGS84", projection(grid))){
+    #     print("Checking AOI CRS...OK")
+    #   } else {
+    #     print("....transforming to longlat WGS84")
+    #     grid.wgs84 <- spTransform(grid, CRS=CRS("+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"))
+    #   }
+    #   ce <- cbind(points.wgs84, ce)
+    #   names(ce)[1:2] <- c("lon", "lat")
+    #   print("loaded csv")
+    return(list(atts=atts, geom=geom, view=view))
+  }
+  
+  ## Browse to directory
+#   observe({ 
+#     if (input$ChooseDir == 0)
+#       return(NULL)
+#     
+#     dirname <- choose.dir()
+#     #str(input$ChooseDir)
+#     isolate({
+#       updateTextInput(session, "InVEST", "InVEST Workspace", value=dirname)
+#     })
+#   })
+  
+  ## def function to upload results from dir
+#   loadONE <- reactive({ 
+#     if (input$upload == 0)
+#       return(NULL)
+#     
+#     isolate({
+#       grid <- LoadSpace()
+#       return(grid)
+#     })
+#   })
   
   ## COMP: Browse to baseline directory 
   observe({ 
@@ -131,37 +165,22 @@ shinyServer(function(input, output, session) {
     })
   })
   
-  ## Read InVEST logfile.txt
-  loadLOG <- reactive({
-    if (input$upload == 0)
-      return(NULL)
-    
-    #isolate({
-    #input$upload
-    ws <- input$InVEST
-    logfile <- readLines(con=file.path(ws, list.files(path=ws, pattern=glob2rx("recreation_client-log*.txt"))), n=-1)
-    blanks <- which(logfile=="")
-    log <- logfile[1:(min(blanks) - 1)]
-    print("loaded log")
-    print(log[6])
-    return(log)
-    #})
-    
-  })
+  
   
   ## Render the logfile on the About page
   output$config <- renderTable({
     if (input$upload == 0)
       return(NULL)
-    isolate({ matrix(loadLOG()) })
+    print(loadLOG()[["logtable"]])
+    isolate({ loadLOG()[["logtable"]] })
   })
-  output$directory <- renderText({
-    if (input$upload == 0)
-      return(NULL)
-    isolate({
-      tail(unlist(strsplit(tail(loadLOG(), 1), split=" ")), 1)
-    })
-  })
+#   output$directory <- renderText({
+#     if (input$upload == 0)
+#       return(NULL)
+#     isolate({
+#       tail(unlist(strsplit(tail(loadLOG(), 1), split=" ")), 1)
+#     })
+#   })
   
   ## PLOT: set map layer input variable
   ## requires uploading results with loadONE()
@@ -170,11 +189,11 @@ shinyServer(function(input, output, session) {
       return(NULL)
     isolate({
       print("updating select")
-      grid <- loadONE()
+      atts <- LoadSpace()[["atts"]]
       
       updateSelectInput(session, "mapvar2",
                         label = "Map Layer",
-                        choices = names(grid@data)[2:5],
+                        choices = names(atts),
                         selected = "usdyav"
       )
     })
@@ -193,11 +212,20 @@ shinyServer(function(input, output, session) {
       return(NULL)
     
     isolate({
-      grid <- loadONE()
-      dat <- grid@data
+      atts <- LoadSpace()[["atts"]]
+      dat <- atts[[input$mapvar2]]
       #print(class(ce))
       #print(input$mapvar2)
-      cols <- brewer.pal(8, "BuPu")[as.numeric(cut(dat[[input$mapvar2]], breaks=8))]
+      if (input$mapvar2 %in% c("usdyav", "usdyav_pr")){
+        ramp <- "BuPu"
+      } else {
+        ramp <- "Oranges"
+      }
+      if (input$mapvar2 == "usdyav"){
+        cols <- as.list(brewer.pal(8, ramp)[as.numeric(cut(log(dat+1), breaks=8))])
+      } else {
+        cols <- as.list(brewer.pal(8, ramp)[as.numeric(cut(dat, breaks=8))])
+      }
       #print(head(cols))
       return(cols)
     })
@@ -221,42 +249,54 @@ shinyServer(function(input, output, session) {
     if (is.null(input$mapvar2))
       return(NULL)
     print("plotMap past NULLs")
-    grid <- loadONE()
-    grid@data <- grid@data[,1:5]
-    grid@data$col <- getCol()
-
-    if (!file.exists(file.path(".", "tmpdir"))){
-      tmppath <- dir.create(file.path(".", "tmpdir"))
-    } else {
-      tmppath <- file.path(".", "tmpdir")
-    }
-    jsonfile <- tempfile("grid", tmpdir=tmppath)
-    print("WRITING geoJSON")
-    writeOGR(grid, jsonfile, layer="", driver="GeoJSON", overwrite_layer=T)
-    print("READING geoJSON")
-    grid.list <- RJSONIO::fromJSON("./tmpdir/gridjson.geojson")
-    grid.list[[3]] <- lapply(grid.list[[3]], function(x){
+    #atts <- LoadSpace()[["atts"]]
+    #atts <- atts[,1:5]
+    
+    cols <- getCol()
+    isolate({
+      grid <- LoadSpace()[["geom"]]
+      view <- LoadSpace()[["view"]]
+    })
+#     grid[[2]] <- lapply(grid[[2]], function(x){
+#       mat <- as.matrix(unlist(x))
+#       mat <- as.matrix(mat[(grep("geometry*", rownames(mat))*-1),])
+#       x$popup <- hwrite(mat)
+#       x$
+#       return(x)
+#     })
+    for (i in 1:length(grid[[2]])){
+      x <- grid[[2]][[i]]
+      y <- cols[[i]]
       mat <- as.matrix(unlist(x))
       mat <- as.matrix(mat[(grep("geometry*", rownames(mat))*-1),])
       x$popup <- hwrite(mat)
-      return(x)
-    })
-    L0$setView(c(mean(c(bbox(grid)[2,1], bbox(grid)[2,2])),mean(c(bbox(grid)[1,1], bbox(grid)[1,2])), 8))
-    L0$geoJson(grid.list, 
+      if (x$properties[input$mapvar2] == 0) {
+        x$col <- "#606060"
+      } else {
+        x$col <- y
+      }
+      grid[[2]][[i]] <- x
+    }
+    
+    L0$geoJson(grid, 
            onEachFeature = "#! function(feature, layer){
             layer.bindPopup(feature.popup)
-           } !#",
+            } !#",
            style="#! function style(feature){
             return {
               fill:true,
-              fillColor: feature.properties.col,
+              fillColor: feature.col,
               fillOpacity:0.7,
               color:'white',
               weight:1
             };
            } !#"
     )
+    #print(L0$setView(view(), zoom()))
+    print(view)
+    L0$setView(view$center+0.6, view$zoom)
     return(L0)
+
     })
   
   ## PLOT: render 1st Leaflet
