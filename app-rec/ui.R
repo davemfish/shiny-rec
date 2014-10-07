@@ -27,10 +27,10 @@ shinyUI(#fluidPage(
 #                           actionButton("ChooseDir", "Browse"),
 #                           tags$br(),
                            actionButton("upload", strong('Display Results')),
-#                           p(tags$small(em("(this may take a moment)"))),
-#                           br(),
+                           p(tags$small(em("(this may take a moment)"))),
+                           br(),
                           h4("Explore your results"),
-                          p("After clicking 'Upload Results', information about the parameters of your InVEST run will appear on the 'About' tab.
+                          p("After clicking 'Display Results', information about the parameters of your InVEST run will appear on the 'About' tab.
                             To visualize a different InVEST run, browse to a different logfile, and click 'Display' again.")
                           ),
                         mainPanel(
@@ -47,9 +47,10 @@ shinyUI(#fluidPage(
                         sidebarPanel(
                           uiOutput("tablenames"),
                           br(),
-                          downloadButton("downloadCSV", label = "Download CSV", class = NULL)
+                          downloadButton("downloadCSV", label = "Download CSV", class = NULL),
                           br(),
-                          p("These data can also be accessed in the attribute table of the grid.shp shapefile in the results folder of your workspace.)
+                          br(),
+                          p(tags$small("These data can also be accessed in the attribute table of the 'grid.shp' shapefile in the results folder of your workspace."))
                         ),
                         mainPanel(
                           dataTableOutput("printtable"))

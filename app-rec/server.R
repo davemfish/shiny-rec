@@ -91,7 +91,7 @@ shinyServer(function(input, output, session) {
     geom <- fromJSON(file.path(ws, "grid.geojson"))
     aoijson <- fromJSON(file.path(ws, "aoi.geojson"))
     aoibbox <- aoijson[[2]][[1]]$bbox
-    center <- c(mean(aoibbox[2], aoibbox[4]), mean(aoibbox[1], aoibbox[3]))
+    center <- c(mean(c(aoibbox[2], aoibbox[4])), mean(c(aoibbox[1], aoibbox[3])))    
     zoom <- 8
     view <- list(center=center, zoom=zoom)
     #grid <- readOGR(dsn=ws, layer="grid")
@@ -298,7 +298,7 @@ shinyServer(function(input, output, session) {
     )
     #print(L0$setView(view(), zoom()))
     print(view)
-    L0$setView(view$center+0.6, view$zoom)
+    L0$setView(view$center, view$zoom)
     return(L0)
 
     })
