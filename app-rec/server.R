@@ -171,8 +171,8 @@ shinyServer(function(input, output, session) {
   output$config <- renderTable({
     if (input$upload == 0)
       return(NULL)
-    print(loadLOG()[["logtable"]])
-    isolate({ loadLOG()[["logtable"]] })
+    print(loadLOG()[[2]])
+    isolate({ matrix(loadLOG()[[2]]) })
   })
 #   output$directory <- renderText({
 #     if (input$upload == 0)
@@ -268,8 +268,12 @@ shinyServer(function(input, output, session) {
       x <- grid[[2]][[i]]
       y <- cols[[i]]
       mat <- as.matrix(unlist(x))
+      mat <- as.matrix(mat[(grep("bbox*", rownames(mat))*-1),])
       mat <- as.matrix(mat[(grep("geometry*", rownames(mat))*-1),])
+      rownames(mat) <- sub(pattern="properties.", replacement="", rownames(mat))
       x$popup <- hwrite(mat)
+      pat <- paste("<td>", input$mapvar2, "</td>", sep="")
+      x$popup <- sub(pattern=pat, replacement=paste("<td><b>", input$mapvar2, "</b></td>", sep=""), x$popup)
       if (x$properties[input$mapvar2] == 0) {
         x$col <- "#606060"
       } else {
@@ -464,12 +468,12 @@ shinyServer(function(input, output, session) {
     if (input$upload == 0)
       return(NULL)
     isolate({
-      df <- loadONE()
+      df <- LoadSpace()[["atts"]]
     })
     checkboxGroupInput("tablenames", 
                        label="Select columns for the table", 
                        choices=names(df),
-                       selected = c("lon", "lat", "coastal_exposure")
+                       selected = c("cellID", "usdyav")
     )
   })
   
@@ -477,9 +481,9 @@ shinyServer(function(input, output, session) {
     if (is.null(input$tablenames))
       return(NULL)
     isolate({
-      df <- loadONE()
-      print(names(df))
-      print(input$tablenames)
+      df <- LoadSpace()[["atts"]]
+      #print(names(df))
+      #print(input$tablenames)
       df <- format(df[,input$tablenames], nsmall=3, digits=3)
     })
     #print()
@@ -487,8 +491,9 @@ shinyServer(function(input, output, session) {
   })
   
   output$printtable <- renderDataTable({
-    FormatTable()
-  })
+    FormatTable()},
+    options=list(pageLength = 10)
+  )
   
   output$downloadCSV <- downloadHandler(
     filename = paste('data-', '.csv', sep=''),

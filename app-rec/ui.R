@@ -48,6 +48,8 @@ shinyUI(#fluidPage(
                           uiOutput("tablenames"),
                           br(),
                           downloadButton("downloadCSV", label = "Download CSV", class = NULL)
+                          br(),
+                          p("These data can also be accessed in the attribute table of the grid.shp shapefile in the results folder of your workspace.)
                         ),
                         mainPanel(
                           dataTableOutput("printtable"))
