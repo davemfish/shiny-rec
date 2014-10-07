@@ -132,38 +132,38 @@ shinyServer(function(input, output, session) {
 #     })
 #   })
   
-  ## COMP: Browse to baseline directory 
-  observe({ 
-    if (input$ChooseBase == 0)
-      return(NULL)
-    
-    dirname <- choose.dir()
-    isolate({
-      updateTextInput(session, "Baseline", "", value=dirname)
-    })
-  })
-  
-  ## COMP: Browse to scenario directory 
-  observe({ 
-    if (input$ChooseScen == 0)
-      return(NULL)
-    
-    dirname <- choose.dir()
-    isolate({
-      updateTextInput(session, "Scenario", "", value=dirname)
-    })
-  })
-  
-  ## COMP: def function to upload both sets of results
-  loadTWO <- reactive({
-    if (input$Difference == 0)
-      return(NULL)
-    isolate({
-      ce.base <- LoadSpace(input$Baseline)
-      ce.scen <- LoadSpace(input$Scenario)
-      return(list(ce.base, ce.scen))
-    })
-  })
+#   ## COMP: Browse to baseline directory 
+#   observe({ 
+#     if (input$ChooseBase == 0)
+#       return(NULL)
+#     
+#     dirname <- choose.dir()
+#     isolate({
+#       updateTextInput(session, "Baseline", "", value=dirname)
+#     })
+#   })
+#   
+#   ## COMP: Browse to scenario directory 
+#   observe({ 
+#     if (input$ChooseScen == 0)
+#       return(NULL)
+#     
+#     dirname <- choose.dir()
+#     isolate({
+#       updateTextInput(session, "Scenario", "", value=dirname)
+#     })
+#   })
+#   
+#   ## COMP: def function to upload both sets of results
+#   loadTWO <- reactive({
+#     if (input$Difference == 0)
+#       return(NULL)
+#     isolate({
+#       ce.base <- LoadSpace(input$Baseline)
+#       ce.scen <- LoadSpace(input$Scenario)
+#       return(list(ce.base, ce.scen))
+#     })
+#   })
   
   
   
@@ -318,123 +318,123 @@ shinyServer(function(input, output, session) {
   ## PLOT: render array of histograms
 
   
-  ## COMP: 
-  ## Initialize 2nd leaflet map
-  L2 <- Leaflet$new()
-  #L1$addAssets(jshead = "https://github.com/turban/Leaflet.Sync/blob/master/L.Map.Sync.js")
-  L2$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
-  L2$set(width = 550, height = 450)  
-  
-  ## COMP:
-  ## def function that differences values in 2 scenarios
-  ## requires upload with loadTWO()
-  Difference <- reactive({
-    if (input$Difference == 0)
-      return(NULL)
-    if (is.null(input$fieldnames))
-      return(NULL)
-    isolate({
-      df.base <- loadTWO()[[1]]
-      df.scen <- loadTWO()[[2]]
-      diff <- df.scen[ ,input$fieldnames] - df.base[ ,input$fieldnames]
-      diff <- cbind(df.base[,c("lat", "lon")], diff)
-      names(diff) <- c("lat", "lon", "delta")
-      diff$baseline <- df.base[ ,input$fieldnames]
-      diff$scenario <- df.scen[ ,input$fieldnames]
-      print("diff summ")
-      print(summary(diff))
-    })
-    return(diff)
-  })
-  
-  ## COMP:
-  ## def function for assigning color to map variable, which is the differenced value
-  ## calls Difference(), Breaks() 
-  getCol2 <- reactive({
-    if (input$Difference == 0)
-      return(NULL)
-    if (is.null(input$fieldnames))
-      return(NULL)
-    #print(input$Symbolize)
-    #print(input$Breaks3)
-    
-    #isolate({
-    isolate({
-      diff <- Difference()
-      colbrks <- as.numeric(cut(diff$delta, breaks=c(-10, -0.0001, 0.0001, 10), labels=F))
-    })
-    print("Diff info")
-    
-    print(summary(diff$delta))
-    cols <- c(rgb(0,0,1), rgb(1,1,1), rgb(1,0,0))[colbrks]
-    print("cols info")
-    print(head(colbrks))
-    print(summary(colbrks))
-    print(head(cols))
-    print(length(cols))
-    return(cols)
-    #})
-  })
-  
-  
-  
-  
-  ## COMP:
-  ## def function to add points to comparison map
-  ## calss to getCol2(), 
-  plotMap2 <- reactive({
-    if (input$Difference == 0)
-      return(NULL)
-    if (is.null(input$fieldnames))
-      return(NULL)
-    
-    df.diff <- Difference()
-    df.diff$col <- getCol2()
-    #print("what's the class")
-    #print(class(df.diff$delta))
-    df.diff$circ <- sapply(df.diff$delta, FUN=function(x){((sqrt(abs(x)/pi))+1.5)^2.5})
-    tmp.diff <- apply(df.diff, 1, as.list)
-    tmp.diff <- lapply(tmp.diff, function(x){
-      mat <- as.matrix(unlist(x))
-      mat <- as.matrix(mat[!(rownames(mat) %in% c("x", "y", "array.row", "array.col", "col", "circ")),])
-      x$popup <- hwrite(mat)
-      return(x)
-    })
-    
-    L2$setView(c(mean(df.diff$lat), mean(df.diff$lon)), 9)
-    L2$geoJson(toGeoJSON(tmp.diff, lat='lat', lon='lon'), 
-               onEachFeature = '#! function(feature, layer){
-               layer.bindPopup(feature.properties.popup)
-  } !#',
-               pointToLayer =  "#! function(feature, latlng){
-               return L.circleMarker(latlng, {
-               radius: feature.properties.circ,
-               fillColor: feature.properties.col || 'white',    
-               color: '#000',
-               weight: 1,
-               fillOpacity: 0.65
-               })
-               } !#")
-    return(L2)
-    })
-  
-  #radius: sqrt(abs(feature.properties.delta)/3.14159)+1
-  
-  ## COMP:
-  ## Select boxes with variables common to both scenarios. Used to build a table.
-  ## requires uploading results with loadTWO()
-  output$diffnames <- renderUI({
-    if (input$Difference == 0)
-      return(NULL)
-    isolate({
-      df.base <- loadTWO()[[1]]
-      df.scen <- loadTWO()[[2]]
-    })
-    selectInput("fieldnames", 
-                label="Select values to compare", 
-                choices=intersect(names(df.base)[-6:-1], names(df.scen)),
-                selected = "coastal_exposure")
-  })
+#   ## COMP: 
+#   ## Initialize 2nd leaflet map
+#   L2 <- Leaflet$new()
+#   #L1$addAssets(jshead = "https://github.com/turban/Leaflet.Sync/blob/master/L.Map.Sync.js")
+#   L2$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
+#   L2$set(width = 550, height = 450)  
+#   
+#   ## COMP:
+#   ## def function that differences values in 2 scenarios
+#   ## requires upload with loadTWO()
+#   Difference <- reactive({
+#     if (input$Difference == 0)
+#       return(NULL)
+#     if (is.null(input$fieldnames))
+#       return(NULL)
+#     isolate({
+#       df.base <- loadTWO()[[1]]
+#       df.scen <- loadTWO()[[2]]
+#       diff <- df.scen[ ,input$fieldnames] - df.base[ ,input$fieldnames]
+#       diff <- cbind(df.base[,c("lat", "lon")], diff)
+#       names(diff) <- c("lat", "lon", "delta")
+#       diff$baseline <- df.base[ ,input$fieldnames]
+#       diff$scenario <- df.scen[ ,input$fieldnames]
+#       print("diff summ")
+#       print(summary(diff))
+#     })
+#     return(diff)
+#   })
+#   
+#   ## COMP:
+#   ## def function for assigning color to map variable, which is the differenced value
+#   ## calls Difference(), Breaks() 
+#   getCol2 <- reactive({
+#     if (input$Difference == 0)
+#       return(NULL)
+#     if (is.null(input$fieldnames))
+#       return(NULL)
+#     #print(input$Symbolize)
+#     #print(input$Breaks3)
+#     
+#     #isolate({
+#     isolate({
+#       diff <- Difference()
+#       colbrks <- as.numeric(cut(diff$delta, breaks=c(-10, -0.0001, 0.0001, 10), labels=F))
+#     })
+#     print("Diff info")
+#     
+#     print(summary(diff$delta))
+#     cols <- c(rgb(0,0,1), rgb(1,1,1), rgb(1,0,0))[colbrks]
+#     print("cols info")
+#     print(head(colbrks))
+#     print(summary(colbrks))
+#     print(head(cols))
+#     print(length(cols))
+#     return(cols)
+#     #})
+#   })
+#   
+#   
+#   
+#   
+#   ## COMP:
+#   ## def function to add points to comparison map
+#   ## calss to getCol2(), 
+#   plotMap2 <- reactive({
+#     if (input$Difference == 0)
+#       return(NULL)
+#     if (is.null(input$fieldnames))
+#       return(NULL)
+#     
+#     df.diff <- Difference()
+#     df.diff$col <- getCol2()
+#     #print("what's the class")
+#     #print(class(df.diff$delta))
+#     df.diff$circ <- sapply(df.diff$delta, FUN=function(x){((sqrt(abs(x)/pi))+1.5)^2.5})
+#     tmp.diff <- apply(df.diff, 1, as.list)
+#     tmp.diff <- lapply(tmp.diff, function(x){
+#       mat <- as.matrix(unlist(x))
+#       mat <- as.matrix(mat[!(rownames(mat) %in% c("x", "y", "array.row", "array.col", "col", "circ")),])
+#       x$popup <- hwrite(mat)
+#       return(x)
+#     })
+#     
+#     L2$setView(c(mean(df.diff$lat), mean(df.diff$lon)), 9)
+#     L2$geoJson(toGeoJSON(tmp.diff, lat='lat', lon='lon'), 
+#                onEachFeature = '#! function(feature, layer){
+#                layer.bindPopup(feature.properties.popup)
+#   } !#',
+#                pointToLayer =  "#! function(feature, latlng){
+#                return L.circleMarker(latlng, {
+#                radius: feature.properties.circ,
+#                fillColor: feature.properties.col || 'white',    
+#                color: '#000',
+#                weight: 1,
+#                fillOpacity: 0.65
+#                })
+#                } !#")
+#     return(L2)
+#     })
+#   
+#   #radius: sqrt(abs(feature.properties.delta)/3.14159)+1
+#   
+#   ## COMP:
+#   ## Select boxes with variables common to both scenarios. Used to build a table.
+#   ## requires uploading results with loadTWO()
+#   output$diffnames <- renderUI({
+#     if (input$Difference == 0)
+#       return(NULL)
+#     isolate({
+#       df.base <- loadTWO()[[1]]
+#       df.scen <- loadTWO()[[2]]
+#     })
+#     selectInput("fieldnames", 
+#                 label="Select values to compare", 
+#                 choices=intersect(names(df.base)[-6:-1], names(df.scen)),
+#                 selected = "coastal_exposure")
+#   })
   
   #   output$difftable <- renderDataTable({
   #     if (input$diffcalc == 0)
@@ -451,16 +451,16 @@ shinyServer(function(input, output, session) {
   #     return(df.diff)
   #   })
   
-  output$Rleafmap2 <- renderMap({
-    if (input$Difference == 0){
-      L01 <- Leaflet$new()
-      L01$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
-      L01$setView(c(0, 0), 1)  
-      L01$set(width = 550, height = 450) 
-      return(L01)
-    }
-    plotMap2()
-  })
+#   output$Rleafmap2 <- renderMap({
+#     if (input$Difference == 0){
+#       L01 <- Leaflet$new()
+#       L01$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
+#       L01$setView(c(0, 0), 1)  
+#       L01$set(width = 550, height = 450) 
+#       return(L01)
+#     }
+#     plotMap2()
+#   })
   
   
   ### TABLE tab:
