@@ -229,12 +229,14 @@ shinyServer(function(input, output, session) {
         ramp <- "Oranges"
       }
       if (input$mapvar2 == "usdyav"){
-        cols <- as.list(brewer.pal(8, ramp)[as.numeric(cut(log(dat+1), breaks=8))])
+        brks <- cut(log(dat+1), breaks=6)
+        cols <- as.list(brewer.pal(6, ramp)[as.numeric(brks)])
       } else {
-        cols <- as.list(brewer.pal(8, ramp)[as.numeric(cut(dat, breaks=8))])
+        brks <- cut(dat, breaks=6)
+        cols <- as.list(brewer.pal(6, ramp)[as.numeric(brks)])
       }
       #print(head(cols))
-      return(cols)
+      return(list(cols=cols, brks=brks))
     })
   })
   
@@ -259,7 +261,8 @@ shinyServer(function(input, output, session) {
     #atts <- LoadSpace()[["atts"]]
     #atts <- atts[,1:5]
     
-    cols <- getCol()
+    cols <- getCol()[["cols"]]
+    
     isolate({
       print("reloading JSON?")
       grid <- LoadSpace()[["geom"]]
@@ -305,8 +308,31 @@ shinyServer(function(input, output, session) {
             };
            } !#"
     )
-    #print(L0$setView(view(), zoom()))
-    print(view)
+    print(length(unique(cols)))
+    brks.list <- Cut2Num(getCol()[["brks"]])
+#print(brks)
+    brks <- brks.list[["brks"]]
+    if (input$mapvar2 == "usdyav"){
+      legbrks <- round(exp(brks)-1, digits=3)
+    } else {
+      legbrks <- round(brks, digits=3)
+    }
+    if (input$mapvar2 %in% c("usdyav", "usdyav_pr")){
+      ramp <- "BuPu"
+    } else {
+      ramp <- "Oranges"
+    }
+print(legbrks)
+    legbrks[1] <- 0
+    ids <- brks.list[["ids"]]
+    ids <- ids[order(ids)]
+    ids <- c(1, ids+1)
+print(ids)
+    legbrks <- legbrks[ids]
+#    unique(cols)
+    
+    legcols <- c("#606060", brewer.pal(6, ramp))[ids]
+    L0$legend(position="bottomright", colors=legcols, labels=legbrks)
     L0$setView(view$center, view$zoom)
     return(L0)
 
