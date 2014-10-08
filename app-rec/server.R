@@ -178,8 +178,8 @@ shinyServer(function(input, output, session) {
   output$config <- renderTable({
     if (input$upload == 0)
       return(NULL)
-    print(LoadLOG()[[2]])
-    isolate({ matrix(LoadLOG()[[2]]) })
+    print(loadLOG()[[2]])
+    isolate({ matrix(loadLOG()[[2]]) })
   })
 #   output$directory <- renderText({
 #     if (input$upload == 0)
@@ -200,7 +200,7 @@ shinyServer(function(input, output, session) {
       
       updateSelectInput(session, "mapvar2",
                         label = "Map Layer",
-                        choices = names(atts),
+                        choices = names(atts)[!(names(atts) %in% c("cellID", "cellArea"))],
                         selected = "usdyav"
       )
     })
@@ -278,6 +278,7 @@ shinyServer(function(input, output, session) {
       mat <- as.matrix(unlist(x))
       mat <- as.matrix(mat[(grep("bbox*", rownames(mat))*-1),])
       mat <- as.matrix(mat[(grep("geometry*", rownames(mat))*-1),])
+      mat <- as.matrix(mat[!(rownames(mat) %in% c("properties.cellArea", "type")),])
       rownames(mat) <- sub(pattern="properties.", replacement="", rownames(mat))
       x$popup <- hwrite(mat)
       pat <- paste("<td>", input$mapvar2, "</td>", sep="")

@@ -104,6 +104,6 @@ shinyUI(#fluidPage(
                         You may also wish to explore and analyze your results 
                         further with GIS software or other data analysis software."),
                       p("This application is built with R and Shiny. The source code is available and
-                        you are encouraged to submit bugs at https://github.com/davemfish/shiny-cv")
+                        you are encouraged to submit bugs at https://github.com/davemfish/shiny-rec")
              )             
 ))#)
