@@ -29,21 +29,21 @@ library(RJSONIO)
 #                 #legend.text=element_blank(),
 #                 legend.position="none")
 # 
-# th.hist <- theme(panel.background = element_rect(fill="white"), 
-#                  axis.text.y=element_text(size=12),
-#                  axis.text.x=element_text(size=12),
-#                  #axis.title.x=element_blank(),
-#                  #axis.title.y=element_blank(),
-#                  #strip.text=element_blank(), 
-#                  strip.background=element_blank(), 
-#                  panel.border = element_rect(color="black", fill=NA), 
-#                  #panel.grid.minor.x=element_line(size=.2, color="gray", linetype="dashed"), 
-#                  panel.grid.major.y=element_blank(),
-#                  panel.grid.minor.y=element_blank(),
-#                  panel.grid.minor.x=element_blank(),
-#                  panel.grid.major.x=element_blank(),
-#                  #legend.text=element_blank(),
-#                  legend.position="none")
+th.hist <- theme(panel.background = element_rect(fill="white"), 
+                 axis.text.y=element_text(size=12),
+                 axis.text.x=element_text(size=12),
+                 #axis.title.x=element_blank(),
+                 #axis.title.y=element_blank(),
+                 #strip.text=element_blank(), 
+                 strip.background=element_blank(), 
+                 panel.border = element_rect(color="black", fill=NA), 
+                 #panel.grid.minor.x=element_line(size=.2, color="gray", linetype="dashed"), 
+                 panel.grid.major.y=element_blank(),
+                 panel.grid.minor.y=element_blank(),
+                 panel.grid.minor.x=element_blank(),
+                 panel.grid.major.x=element_blank(),
+                 #legend.text=element_blank(),
+                 legend.position="none")
 
 
 print("start function")
@@ -82,7 +82,7 @@ shinyServer(function(input, output, session) {
     
   })
   
-  LoadSpace <- function(){
+  LoadSpace <- reactive({
     sessid <- loadLOG()[[1]]
     #sessid <- "jvv94vs9fl7pflqmkd91aksm61"
     ws <- file.path("http://ncp-skookum.stanford.edu/~woodsp", sessid)
@@ -107,7 +107,14 @@ shinyServer(function(input, output, session) {
     #   names(ce)[1:2] <- c("lon", "lat")
     #   print("loaded csv")
     return(list(atts=atts, geom=geom, view=view))
-  }
+  })
+
+# #observe({
+# #  if (input$upload > 0){
+#     logdata <- loadLOG()
+#     results <- LoadSpace(logdata)
+# #  }
+# #})
   
   ## Browse to directory
 #   observe({ 
@@ -171,8 +178,8 @@ shinyServer(function(input, output, session) {
   output$config <- renderTable({
     if (input$upload == 0)
       return(NULL)
-    print(loadLOG()[[2]])
-    isolate({ matrix(loadLOG()[[2]]) })
+    print(LoadLOG()[[2]])
+    isolate({ matrix(LoadLOG()[[2]]) })
   })
 #   output$directory <- renderText({
 #     if (input$upload == 0)
@@ -254,6 +261,7 @@ shinyServer(function(input, output, session) {
     
     cols <- getCol()
     isolate({
+      print("reloading JSON?")
       grid <- LoadSpace()[["geom"]]
       view <- LoadSpace()[["view"]]
     })
@@ -316,7 +324,33 @@ shinyServer(function(input, output, session) {
   
   
   ## PLOT: render array of histograms
-
+#   output$hist <- renderPlot({
+#     isolate({
+#       dat <- LoadSpace()[["atts"]]
+#       if (input$mapvar2 %in% c("usdyav", "usdyav_pr")){
+#         ramp <- "BuPu"
+#       } else {
+#         ramp <- "Oranges"
+#       }
+#       if (input$mapvar2 == "usdyav"){
+#         brks <- cut(log(dat+1), breaks=8)
+#         cols <- as.list(brewer.pal(8, ramp)[as.numeric(brks)])
+#       } else {
+#         brks <- cut(dat, breaks=8)
+#         cols <- as.list(brewer.pal(8, ramp)[as.numeric(brks)])
+#       }
+#     })
+#     levs <- levels(brks)
+#     ring <- strsplit(levs, split=",")[[1]][1]
+#     gghist <- ggplot(dat, aes(x=input$mapvar2)) +
+#       geom_bar(stat="bin", binwidth=0.01) +
+#       scale_fill_brewer(palette=ramp) +
+#       geom_vline(data=data.frame(brk), xintercept=brk, linetype="dashed") +
+#       scale_x_continuous(breaks=brk) +
+#       #xlim(min(df), max(df)) +
+#       th.hist  
+#   })
+  
   
 #   ## COMP: 
 #   ## Initialize 2nd leaflet map
@@ -497,7 +531,7 @@ shinyServer(function(input, output, session) {
   
   output$downloadCSV <- downloadHandler(
     filename = paste('data-', '.csv', sep=''),
-    content = function(file) {write.csv(FormatTable(), file)}
+    content = function(file) {write.csv(FormatTable(), file, row.names=F)}
   )
   
   })
