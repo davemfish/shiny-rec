@@ -34,8 +34,11 @@ shinyUI(#fluidPage(
                             To visualize a different InVEST run, browse to a different logfile, and click 'Display' again.")
                           ),
                         mainPanel(
-                          selectInput("mapvar2", label="Map Layer", choices=NULL),
+                          #HTML('<style type="text/css"> .span8 .selectize-control { float: right; } </style>'),
+                          radioButtons("mapvar2", label="Map Layer:", choices=NA, inline=T),
                           chartOutput("Rleafmap", 'leaflet'),
+                          #HTML("<script> new L.Control.Zoom({ position: 'topright' }).addTo(map); </script>"),
+                          #tags$script(type='text/javascript', "new L.Control.Zoom({ position: 'topright' }).addTo(map);"),
                           h5(""),
                           br(),
                           plotOutput("hist2")

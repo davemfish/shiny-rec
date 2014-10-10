@@ -56,7 +56,12 @@ print("start function")
 L0 <- Leaflet$new()
 L0$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
 L0$setView(c(0, 0), 1)  
-L0$set(width = 550, height = 450) 
+L0$set(width = 550, height = 450)
+L0$mapOpts(zoomControl=FALSE) 
+recTemplate <- "<script>
+                new L.Control.Zoom({ position: 'topright' }).addTo(map);
+                </script>"
+L0$setTemplate(afterScript = recTemplate)
 
 ###### Server Function ##############
 shinyServer(function(input, output, session) {
@@ -198,10 +203,11 @@ shinyServer(function(input, output, session) {
       print("updating select")
       atts <- LoadSpace()[["atts"]]
       
-      updateSelectInput(session, "mapvar2",
-                        label = "Map Layer",
+      updateRadioButtons(session, "mapvar2",
+                        label = "Map Layer:",
                         choices = names(atts)[!(names(atts) %in% c("cellID", "cellArea"))],
-                        selected = "usdyav"
+                        selected = "usdyav",
+                        inline=T
       )
     })
   })
@@ -342,14 +348,15 @@ print(ids)
 #    unique(cols)
     
     legcols <- c("#606060", brewer.pal(6, ramp))[ids]
-    L0$legend(position="bottomright", colors=legcols, labels=leglabs)
-    L0$setView(view$center, view$zoom)
+    L0$legend(position="topleft", colors=legcols, labels=leglabs)
+    L0$setView(view[["center"]], view[["zoom"]])
+    #L0$setTemplate(afterScript = recTemplate)
     return(L0)
 
     })
   
   ## PLOT: render 1st Leaflet
-  output$Rleafmap <- renderMap({
+  output$Rleafmap <- renderMap2({
     if (input$upload == 0)
       return(L0)
     if (is.null(input$mapvar2))
