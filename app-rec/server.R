@@ -329,10 +329,20 @@ print(legbrks)
     ids <- c(1, ids+1)
 print(ids)
     legbrks <- legbrks[ids]
+    #n <- length(legbrks)
+    leglabs <- list()
+    for (i in 1:length(legbrks)){
+      if (i == 1) { 
+        leglabs[[i]] <- legbrks[i] 
+      } else {
+      leglabs[[i]] <- paste(legbrks[i-1], "-", legbrks[i])
+      }
+    }
+    #leglabs <- c(legbrks[1], paste(legbrks[2], "-", legbrks[3]))
 #    unique(cols)
     
     legcols <- c("#606060", brewer.pal(6, ramp))[ids]
-    L0$legend(position="bottomright", colors=legcols, labels=legbrks)
+    L0$legend(position="bottomright", colors=legcols, labels=leglabs)
     L0$setView(view$center, view$zoom)
     return(L0)
 
