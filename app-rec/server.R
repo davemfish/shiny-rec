@@ -229,12 +229,12 @@ shinyServer(function(input, output, session) {
       dat <- atts[[input$mapvar2]]
       #print(class(ce))
       #print(input$mapvar2)
-      if (input$mapvar2 %in% c("usdyav", "usdyav_pr")){
+      if (input$mapvar2 %in% c("usdyav", "usdyav_pr", "usdyav_est")){
         ramp <- "BuPu"
       } else {
         ramp <- "Oranges"
       }
-      if (input$mapvar2 == "usdyav"){
+      if (input$mapvar2 %in% c("usdyav", "usdyav_est")){
         brks <- cut(log(dat+1), breaks=6)
         cols <- as.list(brewer.pal(6, ramp)[as.numeric(brks)])
       } else {
@@ -285,12 +285,13 @@ shinyServer(function(input, output, session) {
       x <- grid[[2]][[i]]
       y <- cols[[i]]
       mat <- as.matrix(unlist(x))
-      mat <- as.matrix(mat[(grep("bbox*", rownames(mat))*-1),])
+      #   mat <- as.matrix(mat[(grep("bbox*", rownames(mat))*-1),])
       mat <- as.matrix(mat[(grep("geometry*", rownames(mat))*-1),])
       mat <- as.matrix(mat[!(rownames(mat) %in% c("properties.cellArea", "type")),])
       rownames(mat) <- sub(pattern="properties.", replacement="", rownames(mat))
       x$popup <- hwrite(mat)
       pat <- paste("<td>", input$mapvar2, "</td>", sep="")
+      
       x$popup <- sub(pattern=pat, replacement=paste("<td><b>", input$mapvar2, "</b></td>", sep=""), x$popup)
       if (x$properties[input$mapvar2] == 0) {
         x$col <- "#606060"
@@ -299,7 +300,7 @@ shinyServer(function(input, output, session) {
       }
       grid[[2]][[i]] <- x
     }
-    
+
     L0$geoJson(grid, 
            onEachFeature = "#! function(feature, layer){
             layer.bindPopup(feature.popup)
@@ -318,12 +319,12 @@ shinyServer(function(input, output, session) {
     brks.list <- Cut2Num(getCol()[["brks"]])
 #print(brks)
     brks <- brks.list[["brks"]]
-    if (input$mapvar2 == "usdyav"){
+    if (input$mapvar2 %in% c("usdyav", "usdyav_est")){
       legbrks <- round(exp(brks)-1, digits=3)
     } else {
       legbrks <- round(brks, digits=3)
     }
-    if (input$mapvar2 %in% c("usdyav", "usdyav_pr")){
+    if (input$mapvar2 %in% c("usdyav", "usdyav_pr", "usdyav_est")){
       ramp <- "BuPu"
     } else {
       ramp <- "Oranges"
