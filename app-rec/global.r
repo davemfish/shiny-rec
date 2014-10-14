@@ -13,9 +13,18 @@ getSpace <- function(x, two=FALSE){ # x is the session ID
   #unzip(Sys.glob(file.path(ws, "results*.zip")), exdir=ws, overwrite=T)
   atts <- read.csv(file.path(ws, "grid.csv"))
   geom <- fromJSON(file.path(ws, "grid.geojson"))
-  aoijson <- fromJSON(file.path(ws, "aoi.geojson"))
-  aoibbox <- aoijson[[2]][[1]]$bbox
-  center <- c(mean(c(aoibbox[2], aoibbox[4])), mean(c(aoibbox[1], aoibbox[3])))    
+  
+  ### get bbox out of geojson geometry
+  coords <- lapply(geom[[2]], FUN=function(x){
+    return(matrix(unlist(x$geometry$coordinates), ncol=2, byrow=T))
+  })
+  coordmat <- do.call("rbind", coords)
+  center.lon <- mean(coordmat[,1])
+  center.lat <- mean(coordmat[,2])
+  
+#   aoijson <- fromJSON(file.path(ws, "aoi.geojson"))
+#   aoibbox <- aoijson[[2]][[1]]$bbox
+  center <- c(center.lat, center.lon)    
   zoom <- 8
   view <- list(center=center, zoom=zoom)
   if (two == FALSE){
