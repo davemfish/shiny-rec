@@ -133,7 +133,7 @@ output$diffnames <- renderUI({
   })
   selectInput("fieldnames", 
               label="Select values to compare", 
-              choices=diffnames,
+              choices="usdyav_est",
               selected = "usdyav_est")
 })
 
