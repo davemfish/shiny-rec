@@ -224,23 +224,43 @@ output$diffnames <- renderUI({
         ramp <- "Oranges"
       }
       if (input$mapvar2 %in% c("usdyav", "usdyav_est")){
+        ## log transform data and get breaks
         brks <- cut(log(dat+1), breaks=6)
         cols <- as.list(brewer.pal(6, ramp)[as.numeric(brks)])
+        ## convert brks factor to numeric
+        brks.list <- Cut2Num(brks)
+        num.brks <- brks.list[["brks"]]
+        ## back-transform numeric breaks to real values
+        legbrks <- round(exp(num.brks)-1, digits=3)
       } else {
         brks <- cut(dat, breaks=6)
         cols <- as.list(brewer.pal(6, ramp)[as.numeric(brks)])
+        brks.list <- Cut2Num(brks)
+        num.brks <- brks.list[["brks"]]
+        legbrks <- round(num.brks, digits=3)
       }
-      #print(head(cols))
-      return(list(cols=cols, brks=brks))
+      
+      legbrks[1] <- 0
+      ids <- brks.list[["ids"]]
+      ids <- ids[order(ids)]
+      ids <- c(1, ids+1)
+      legbrks <- legbrks[ids]
+      
+      leglabs <- list()
+      for (i in 1:length(legbrks)){
+        if (i == 1) { 
+          leglabs[[i]] <- legbrks[i] 
+        } else {
+          leglabs[[i]] <- paste(legbrks[i-1], "-", legbrks[i])
+        }
+      }
+      
+      legcols <- c("#606060", brewer.pal(6, ramp))[ids]
+
+      return(list(cols=cols, legcols=legcols, leglabs=leglabs))
     })
   })
   
-  
-  ## Initialize first Leaflet Map
-  # L1 <- Leaflet$new()
-  # #L1$addAssets(jshead = "https://github.com/turban/Leaflet.Sync/blob/master/L.Map.Sync.js")
-  # L1$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
-  # L1$set(width = 550, height = 450) 
   
   ## PLOT: def function to add points and set view of leaflet
   ## calls to loadONE(), getCol()
@@ -255,8 +275,8 @@ output$diffnames <- renderUI({
     print("plotMap past NULLs")
     #atts <- LoadSpace()[["atts"]]
     #atts <- atts[,1:5]
-    
-    cols <- getCol()[["cols"]]
+    style <- getCol()
+    cols <- style[["cols"]]
     
     isolate({
       print("reloading JSON?")
@@ -304,45 +324,13 @@ output$diffnames <- renderUI({
             };
            } !#"
     )
-    print(length(unique(cols)))
-    brks.list <- Cut2Num(getCol()[["brks"]])
-#print(brks)
-    brks <- brks.list[["brks"]]
-    if (input$mapvar2 %in% c("usdyav", "usdyav_est")){
-      legbrks <- round(exp(brks)-1, digits=3)
-    } else {
-      legbrks <- round(brks, digits=3)
-    }
-    if (input$mapvar2 %in% c("usdyav", "usdyav_pr", "usdyav_est")){
-      ramp <- "BuPu"
-    } else {
-      ramp <- "Oranges"
-    }
-print(legbrks)
-    legbrks[1] <- 0
-    ids <- brks.list[["ids"]]
-    ids <- ids[order(ids)]
-    ids <- c(1, ids+1)
-print(ids)
-    legbrks <- legbrks[ids]
-    #n <- length(legbrks)
-    leglabs <- list()
-    for (i in 1:length(legbrks)){
-      if (i == 1) { 
-        leglabs[[i]] <- legbrks[i] 
-      } else {
-      leglabs[[i]] <- paste(legbrks[i-1], "-", legbrks[i])
-      }
-    }
-    #leglabs <- c(legbrks[1], paste(legbrks[2], "-", legbrks[3]))
-#    unique(cols)
     
-    legcols <- c("#606060", brewer.pal(6, ramp))[ids]
+    legcols <- style[["legcols"]]
+    leglabs <- style[["leglabs"]]
     L0$legend(position="topleft", colors=legcols, labels=leglabs)
     L0$setView(view[["center"]], view[["zoom"]])
     #L0$setTemplate(afterScript = recTemplate)
     return(L0)
-
     })
   
   ## PLOT: render 1st Leaflet
@@ -401,25 +389,16 @@ print(ids)
       return(NULL)
     if (is.null(input$fieldnames))
       return(NULL)
-    #print(input$Symbolize)
-    #print(input$Breaks3)
     
-    #isolate({
     isolate({
       diff <- Difference()
-      colbrks <- as.numeric(cut(diff$delta, breaks=c(-10, -0.0001, 0.0001, 10), labels=F))
+      diff$delta[is.infinite(diff$delta)] <- NA
+      brks <- as.numeric(cut(diff$delta, breaks=c(min(diff$delta), 0 - sd(diff$delta), -0.0001, 0.0001, 0 + sd(diff$delta), max(diff$delta)), labels=F))
     })
     print("Diff info")
-    
-    #print(summary(diff$delta))
-    cols <- c(rgb(0,0,1), rgb(1,1,1), rgb(1,0,0))[colbrks]
-#     print("cols info")
-#     print(head(colbrks))
-#     print(summary(colbrks))
-#     print(head(cols))
-#     print(length(cols))
+    cols <- as.list(brewer.pal(5, "RdBu")[as.numeric(brks)])
+    #cols <- c(rgb(0,0,1), rgb(1,1,1), rgb(1,0,0))[colbrks]
     return(cols)
-    #})
   })
   
   ## COMP:
@@ -438,7 +417,8 @@ print(ids)
     view <- LoadSpace2()[["view"]]
     #print("what's the class")
     #print(class(df.diff$delta))
-    df.diff$circ <- sapply(df.diff$delta, FUN=function(x){((sqrt(abs(x)/pi))+1.5)^2.5})
+    df.diff$delta[is.infinite(df.diff$delta)] <- NA
+    #df.diff$circ <- sapply(df.diff$delta, FUN=function(x){((sqrt(abs(x)/pi))+1.5)^2.5})
     print(class(df.diff))
     print(df.diff[1,"delta"])
 #     tmp.diff <- apply(df.diff, 1, as.list)
@@ -452,7 +432,7 @@ print(ids)
     for (i in 1:length(grid[[2]])){
       x <- grid[[2]][[i]]
       x$delta <- df.diff[i,"delta"]
-      y <- cols[i]
+      y <- cols[[i]]
       mat <- as.matrix(unlist(x))
       #   mat <- as.matrix(mat[(grep("bbox*", rownames(mat))*-1),])
       mat <- as.matrix(mat[(grep("geometry*", rownames(mat))*-1),])
