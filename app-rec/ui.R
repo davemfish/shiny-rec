@@ -64,29 +64,24 @@ shinyUI(#fluidPage(
                         sidebarPanel(
                           p("Use this tab to compare results of two InVEST runs.
                             For example, you can visualize the differences between a baseline scenario and an additional scenario."),
-                          
-                          h4("Select an InVEST run to visualize"),
-                          p("Browse to the logfile contained in the workspace you defined when you ran the InVEST model. 
-                            The logfile will have a name such as:"),
-                          p("recreation_client-log-2014-03-31--10_36_58.txt"),
-                          fileInput("base", ""),
+                        
+                          p("Browse to the logfile for each InVEST run."),
+                          fileInput("base", tags$strong("Baseline:")),
                           br(),
-                          fileInput("scen", ""),
+                          fileInput("scen", tags$strong("Scenario:")),
                           br(),
                           actionButton("Difference", strong("Compare Results")),
                           p(tags$small(em("(this may take a moment)"))),
                           
-                          p("After clicking 'Compare Results', values at each coastal segment 
+                          p("After clicking 'Compare Results', values at each cell/polygon 
                             of the 'Baseline' workspace are subtracted from corresponding values 
                             in the 'Scenario' workspace.")
                           ),
                         mainPanel(
                           uiOutput("diffnames"),
                           #tags$head(tags$script(src="leafletbug_fix.js")),
-                          chartOutput("Rleafmap2", 'leaflet'),
-                          p(strong("BLUE"), "represents a", strong("less vulnerable"), "coastline under the scenario, compared to the baseline."),
-                          p(strong('RED'), "represents a", strong("more vulnerable"), "coastline under the scenario, compared to the baseline."),
-                          p("Size of the dot represents the magnitude of change.  Gray dots appear where there is no change.")
+                          chartOutput("Rleafmap2", 'leaflet')
+                          
                           
                         )
                       )
