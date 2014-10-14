@@ -1,0 +1,73 @@
+Arguments:
+comments      
+data_dir      C:\Users\dfisher5\Documents\Recdev\data\Oregon\dir_scen
+json          C:/Users/dfisher5/Documents/Recdev/data/Oregon/InVEST_ORcoast_init/results-2014-10-13--12_45_01/init.json
+mode          scenario
+workspace_dir C:\Users\dfisher5\Documents\Recdev\data\Oregon\InVEST_ORcoast_scen
+
+
+10/13/2014 13:27:24  root               INFO     Logging will be saved to recreation_client-log-2014-10-13--13_27_24.txt
+10/13/2014 13:27:24  root               DEBUG    Loaded the model from invest_natcap.recreation.recreation_client
+10/13/2014 13:27:24  root               INFO     Executing the loaded model
+10/13/2014 13:27:24  root               INFO     Running InVEST version "3.0.1"
+10/13/2014 13:27:24  root               INFO     Python architecture: ('32bit', 'WindowsPE')
+10/13/2014 13:27:24  root               INFO     Disk space remaining for workspace: 191.36 GB
+10/13/2014 13:27:24  root               INFO     Pointing temporary directory at the workspace at C:\Users\dfisher5\Documents\Recdev\data\Oregon\InVEST_ORcoast_scen
+10/13/2014 13:27:24  root               INFO     Updating os.environ["TMP"]=C:\Users\dfisher5\AppData\Local\Temp to C:\Users\dfisher5\Documents\Recdev\data\Oregon\InVEST_ORcoast_scen
+10/13/2014 13:27:24  root               INFO     Updating os.environ["TEMP"]=C:\Users\dfisher5\AppData\Local\Temp to C:\Users\dfisher5\Documents\Recdev\data\Oregon\InVEST_ORcoast_scen
+10/13/2014 13:27:24  root               INFO     Setting os.environ["TMPDIR"]=C:\Users\dfisher5\Documents\Recdev\data\Oregon\InVEST_ORcoast_scen
+10/13/2014 13:27:24  root               INFO     Starting recreation_client
+10/13/2014 13:27:24  recreation_client_init INFO     URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_version.php.
+10/13/2014 13:27:24  recreation_client_init INFO     Trying URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_version.php.
+10/13/2014 13:27:24  recreation_client_init INFO     Assigned server session id ncuevbdk90lrghqdmet8a79h77.
+10/13/2014 13:27:24  recreation_client_init INFO     Checking version.
+10/13/2014 13:27:24  recreation_client_init INFO     You have a compatible version.
+10/13/2014 13:27:24  recreation_client_init INFO     Finished checking version.
+10/13/2014 13:27:24  recreation_client_init INFO     Processing predictors.
+10/13/2014 13:27:24  recreation_client_init INFO     Found ped_access_utm predictor.
+10/13/2014 13:27:24  recreation_client_init INFO     Found veh_access_utm predictor.
+10/13/2014 13:27:24  recreation_client_init INFO     Opening predictors for uploading.
+10/13/2014 13:27:24  recreation_client_init INFO     Trying URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_predictors.php.
+10/13/2014 13:27:24  recreation_client_init INFO     You have uploaded 1 files.
+10/13/2014 13:27:24  recreation_client_init INFO     Your upload size is 36670.
+10/13/2014 13:27:24  recreation_client_init INFO     The max upload size is 20971520.
+10/13/2014 13:27:24  recreation_client_init INFO     Running server side processing.
+10/13/2014 13:27:24  recreation_client_init INFO     URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_scenario.php.
+10/13/2014 13:27:24  recreation_client_init INFO     Trying URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_scenario.php.
+10/13/2014 13:27:24  recreation_client_init INFO     Model running.
+10/13/2014 13:27:25  recreation_client_init INFO     Please wait.
+10/13/2014 13:27:40  recreation_client_init INFO      Running server side scenario with user provided parameters.
+10/13/2014 13:27:40  recreation_client_init INFO      Connecting to database.
+10/13/2014 13:27:40  recreation_client_init INFO      Loading grid.
+10/13/2014 13:27:40  recreation_client_init INFO      Getting list of predictors in grid.
+10/13/2014 13:27:40  recreation_client_init INFO      Processing user uploaded files.
+10/13/2014 13:27:40  recreation_client_init INFO      Found simple predictor veh_access_utm.
+10/13/2014 13:27:40  recreation_client_init WARNING   Predictor veh_access_utm is not in the grid.
+10/13/2014 13:27:40  recreation_client_init INFO      Found simple predictor ped_access_utm.
+10/13/2014 13:27:40  recreation_client_init WARNING   Predictor ped_access_utm is not in the grid.
+10/13/2014 13:27:40  recreation_client_init INFO      Projecting the grid for clips.
+10/13/2014 13:27:40  recreation_client_init INFO      Clipping simple predictors.
+10/13/2014 13:27:40  recreation_client_init INFO      Clipping compound predictors.
+10/13/2014 13:27:40  recreation_client_init INFO      Converting compound predictors to simple predictors.
+10/13/2014 13:27:40  recreation_client_init INFO      Projecting simple predictors.
+10/13/2014 13:27:40  recreation_client_init INFO      Preserving old columns.
+10/13/2014 13:27:40  recreation_client_init INFO      Joining new columns.
+10/13/2014 13:27:40  recreation_client_init INFO      Creating data shapefile.
+10/13/2014 13:27:40  recreation_client_init INFO      Dropped intermediate tables.
+10/13/2014 13:27:40  recreation_client_init INFO     Finished processing data.
+10/13/2014 13:27:40  recreation_client_init INFO     Running regression.
+10/13/2014 13:27:40  recreation_client_init INFO     Trying URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_regression.php.
+10/13/2014 13:27:40  recreation_client_init INFO     Read data for regression computation.
+10/13/2014 13:27:40  recreation_client_init INFO     Calculations use mean annual photo-user-days from 2005-2012.
+10/13/2014 13:27:40  recreation_client_init INFO     Calculated photo-user-days.
+10/13/2014 13:27:40  recreation_client_init INFO     Performed linear regression.
+10/13/2014 13:27:40  recreation_client_init INFO     Wrote regression statistics.
+10/13/2014 13:27:40  recreation_client_init INFO     Trying URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_results.php.
+10/13/2014 13:27:40  recreation_client_init INFO     URL: http://ncp-skookum.stanford.edu/~recreation//data//ncuevbdk90lrghqdmet8a79h77/results.zip.
+10/13/2014 13:27:41  recreation_client_init INFO     Transaction complete
+10/13/2014 13:27:41  root               INFO     Opening file explorer to workspace directory
+10/13/2014 13:27:41  root               INFO     Using windows explorer to view files
+10/13/2014 13:27:41  root               INFO     Disk space free: 191.36 GB
+10/13/2014 13:27:41  root               INFO     Elapsed time: 17.39s
+10/13/2014 13:27:41  root               INFO     Finished.
+10/13/2014 13:27:41  root   

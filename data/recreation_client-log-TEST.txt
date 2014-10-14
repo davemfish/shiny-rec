@@ -1,0 +1,210 @@
+Arguments:
+aoi_file_name C:\InVEST_3_0_1_x86\Recreation\input\initial\BC_AOI.shp
+cell_size     5000.0
+comments      
+data_dir      C:\InVEST_3_0_1_x86\Recreation\input\initial\predictors
+download      False
+global_data   True
+grid          True
+grid_type     1
+landscan      True
+lulc          True
+lulc_1        False
+lulc_2        False
+lulc_3        False
+lulc_4        False
+lulc_5        False
+lulc_6        False
+lulc_7        False
+lulc_8        False
+lulc_list     True
+mode          initial
+osm           True
+osm_0         True
+osm_1         True
+osm_2         True
+osm_3         True
+osm_4         True
+osm_list      True
+workspace_dir C:\Users\dfisher5\Documents\Shiny\Recreation\data\Sample_BC
+
+
+09/30/2014 13:11:24  root               INFO     Logging will be saved to recreation_client-log-2014-09-30--13_11_24.txt
+09/30/2014 13:11:24  root               DEBUG    Loaded the model from invest_natcap.recreation.recreation_client
+09/30/2014 13:11:24  root               INFO     Executing the loaded model
+09/30/2014 13:11:24  root               INFO     Running InVEST version "3.0.1"
+09/30/2014 13:11:24  root               INFO     Python architecture: ('32bit', 'WindowsPE')
+09/30/2014 13:11:24  root               INFO     Disk space remaining for workspace: 193.72 GB
+09/30/2014 13:11:24  root               INFO     Pointing temporary directory at the workspace at C:\Users\dfisher5\Documents\Shiny\Recreation\data\Sample_BC
+09/30/2014 13:11:24  root               INFO     Updating os.environ["TMP"]=C:\Users\dfisher5\AppData\Local\Temp to C:\Users\dfisher5\Documents\Shiny\Recreation\data\Sample_BC
+09/30/2014 13:11:24  root               INFO     Updating os.environ["TEMP"]=C:\Users\dfisher5\AppData\Local\Temp to C:\Users\dfisher5\Documents\Shiny\Recreation\data\Sample_BC
+09/30/2014 13:11:24  root               INFO     Setting os.environ["TMPDIR"]=C:\Users\dfisher5\Documents\Shiny\Recreation\data\Sample_BC
+09/30/2014 13:11:24  root               INFO     Starting recreation_client
+09/30/2014 13:11:24  recreation_client_init INFO     URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_version.php.
+09/30/2014 13:11:24  recreation_client_init INFO     Trying URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_version.php.
+09/30/2014 13:11:24  recreation_client_init INFO     Assigned server session id jvv94vs9fl7pflqmkd91aksm61.
+09/30/2014 13:11:24  recreation_client_init INFO     Checking version.
+09/30/2014 13:11:24  recreation_client_init INFO     You have a compatible version.
+09/30/2014 13:11:24  recreation_client_init INFO     Finished checking version.
+09/30/2014 13:11:24  recreation_client_init INFO     Validating AOI.
+09/30/2014 13:11:24  recreation_client_init INFO     Processing predictors.
+09/30/2014 13:11:24  recreation_client_init INFO     Found parks predictor.
+09/30/2014 13:11:24  recreation_client_init INFO     Opening predictors for uploading.
+09/30/2014 13:11:24  recreation_client_init INFO     Trying URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_predictors.php.
+09/30/2014 13:11:25  recreation_client_init INFO     You have uploaded 1 files.
+09/30/2014 13:11:25  recreation_client_init INFO     Your upload size is 229505.
+09/30/2014 13:11:25  recreation_client_init INFO     The max upload size is 20971520.
+09/30/2014 13:11:25  recreation_client_init INFO     Running server side processing.
+09/30/2014 13:11:25  recreation_client_init INFO     URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_initial.php.
+09/30/2014 13:11:25  recreation_client_init INFO     Trying URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_initial.php.
+09/30/2014 13:11:25  recreation_client_init INFO     Model running.
+09/30/2014 13:11:25  recreation_client_init INFO     Executing recreation Python script.
+09/30/2014 13:11:25  recreation_client_init INFO     Please wait.
+09/30/2014 13:11:40  recreation_client_init INFO      Running server side model with user provided parameters.
+09/30/2014 13:11:40  recreation_client_init INFO      The map unit coversion to meters is 1||0.
+09/30/2014 13:11:40  recreation_client_init INFO      Found parks predictor.
+09/30/2014 13:11:40  recreation_client_init INFO      Incuding simple predictor predictor_landscan.
+09/30/2014 13:11:40  recreation_client_init INFO      Incuding compound predictor planet_osm_point.
+09/30/2014 13:11:40  recreation_client_init INFO      Incuding compound predictor planet_osm_line.
+09/30/2014 13:11:40  recreation_client_init INFO      Incuding compound predictor planet_osm_polygon.
+09/30/2014 13:11:40  recreation_client_init INFO      Checking for custom categorization for standard predictors.
+09/30/2014 13:11:40  recreation_client_init INFO      Only user provided simple predictors found.
+09/30/2014 13:11:40  recreation_client_init INFO      Importing AOI /usr/local/public_html/data/nklgq65to6t1dh7eer264b6lu1/aoi.shp.
+09/30/2014 13:11:40  recreation_client_init INFO      Imported AOI.
+09/30/2014 13:11:40  recreation_client_init INFO      Importing user supplied predictor variables.
+09/30/2014 13:11:40  recreation_client_init INFO      Importing user supplied compound variables.
+09/30/2014 13:11:40  recreation_client_init INFO      Merging AOI if multiple parts.
+09/30/2014 13:11:40  recreation_client_init INFO      Transforming AOI to Latitude and Longitude.
+09/30/2014 13:11:40  recreation_client_init WARNING   The AOI intersects 1 and is covered by 0 administrative area(s).
+09/30/2014 13:11:40  recreation_client_init INFO      Creating hexagonal grid prj_grid from aoi_union using cell size 5000.0.
+09/30/2014 13:11:40  recreation_client_init INFO      The grid contains 574 cells.
+09/30/2014 13:11:40  recreation_client_init INFO      The AOI meets the maximum size requirement.
+09/30/2014 13:11:40  recreation_client_init INFO      Projecting the grid for clips.
+09/30/2014 13:11:40  recreation_client_init INFO      Clipping simple predictors.
+09/30/2014 13:11:40  recreation_client_init INFO      Clipping parks.
+09/30/2014 13:11:40  recreation_client_init INFO      Clipping predictor_landscan.
+09/30/2014 13:11:40  recreation_client_init INFO     Please wait.
+09/30/2014 13:11:55  recreation_client_init INFO     Please wait.
+09/30/2014 13:12:10  recreation_client_init INFO     Please wait.
+09/30/2014 13:12:25  recreation_client_init INFO     Please wait.
+09/30/2014 13:12:40  recreation_client_init INFO     Please wait.
+09/30/2014 13:12:56  recreation_client_init INFO     Please wait.
+09/30/2014 13:13:11  recreation_client_init INFO     Please wait.
+09/30/2014 13:13:26  recreation_client_init INFO     Please wait.
+09/30/2014 13:13:41  recreation_client_init INFO     Please wait.
+09/30/2014 13:13:56  recreation_client_init INFO     Please wait.
+09/30/2014 13:14:11  recreation_client_init INFO     Please wait.
+09/30/2014 13:14:26  recreation_client_init INFO      Clipping compound predictors.
+09/30/2014 13:14:26  recreation_client_init INFO      Clipping planet_osm_point.
+09/30/2014 13:14:26  recreation_client_init INFO      Clipping planet_osm_line.
+09/30/2014 13:14:26  recreation_client_init INFO     Please wait.
+09/30/2014 13:14:41  recreation_client_init INFO      Clipping planet_osm_polygon.
+09/30/2014 13:14:41  recreation_client_init INFO      Converting compound predictors to simple predictors.
+09/30/2014 13:14:41  recreation_client_init INFO      Processing compound predictor planet_osm_point.
+09/30/2014 13:14:41  recreation_client_init INFO      Using default classification for planet_osm_point.
+09/30/2014 13:14:41  recreation_client_init INFO      Processing category pointMisc.
+09/30/2014 13:14:41  recreation_client_init INFO      Processing category pointCult.
+09/30/2014 13:14:41  recreation_client_init INFO      Processing category pointIndus.
+09/30/2014 13:14:41  recreation_client_init INFO      Processing category pointNat.
+09/30/2014 13:14:41  recreation_client_init INFO      Processing category pointStruc.
+09/30/2014 13:14:41  recreation_client_init INFO      Processing compound predictor planet_osm_line.
+09/30/2014 13:14:41  recreation_client_init INFO      Using default classification for planet_osm_line.
+09/30/2014 13:14:41  recreation_client_init INFO      Processing category lineMisc.
+09/30/2014 13:14:42  recreation_client_init INFO     Please wait.
+09/30/2014 13:14:57  recreation_client_init INFO      Processing category lineCult.
+09/30/2014 13:14:57  recreation_client_init INFO      Processing category lineIndus.
+09/30/2014 13:14:57  recreation_client_init INFO      Processing category lineNat.
+09/30/2014 13:14:57  recreation_client_init INFO     Please wait.
+09/30/2014 13:15:12  recreation_client_init INFO      Processing category lineStruc.
+09/30/2014 13:15:12  recreation_client_init INFO      Processing compound predictor planet_osm_polygon.
+09/30/2014 13:15:12  recreation_client_init INFO      Using default classification for planet_osm_polygon.
+09/30/2014 13:15:12  recreation_client_init INFO      Processing category polyMisc.
+09/30/2014 13:15:12  recreation_client_init INFO     Please wait.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing category polyCult.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing category polyIndus.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing category polyNat.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing category polyStruc.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting simple predictors.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting parks.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting predictor_landscan.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting pointmisc.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting pointcult.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting pointindus.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting pointnat.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting pointstruc.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting linemisc.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting linecult.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting lineindus.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting linenat.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting linestruc.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting polymisc.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting polycult.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting polyindus.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting polynat.
+09/30/2014 13:15:27  recreation_client_init INFO      Projecting polystruc.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating parks.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing polygon predictor parks.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating predictor_landscan.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing polygon predictor predictor_landscan.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating pointmisc.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing point predictor pointmisc.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating pointcult.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing point predictor pointcult.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating pointindus.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing point predictor pointindus.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating pointnat.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing point predictor pointnat.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating pointstruc.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing point predictor pointstruc.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating linemisc.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing line predictor linemisc.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating linecult.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing line predictor linecult.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating lineindus.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing line predictor lineindus.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating linenat.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing line predictor linenat.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating linestruc.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing line predictor linestruc.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating polymisc.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing polygon predictor polymisc.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating polycult.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing polygon predictor polycult.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating polyindus.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing polygon predictor polyindus.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating polynat.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing polygon predictor polynat.
+09/30/2014 13:15:27  recreation_client_init INFO      Aggregating polystruc.
+09/30/2014 13:15:27  recreation_client_init INFO      Processing polygon predictor polystruc.
+09/30/2014 13:15:27  recreation_client_init INFO      Joining results.
+09/30/2014 13:15:27  recreation_client_init INFO      Creating data shapefile.
+09/30/2014 13:15:27  recreation_client_init INFO      Transforming grid to Flickr projection.
+09/30/2014 13:15:27  recreation_client_init INFO      Creating Flickr summary table.
+09/30/2014 13:15:27  recreation_client_init INFO     Please wait.
+09/30/2014 13:15:42  recreation_client_init INFO     Please wait.
+09/30/2014 13:15:57  recreation_client_init INFO     Please wait.
+09/30/2014 13:16:15  recreation_client_init INFO     Please wait.
+09/30/2014 13:16:30  recreation_client_init INFO     Please wait.
+09/30/2014 13:16:45  recreation_client_init INFO     Please wait.
+09/30/2014 13:17:00  recreation_client_init INFO     Please wait.
+09/30/2014 13:17:15  recreation_client_init INFO     Please wait.
+09/30/2014 13:17:30  recreation_client_init INFO      Dropping intermediate tables.
+09/30/2014 13:17:30  recreation_client_init INFO      Dropped intermediate tables.
+09/30/2014 13:17:30  recreation_client_init INFO     Finished processing data.
+09/30/2014 13:17:30  recreation_client_init INFO     Running regression.
+09/30/2014 13:17:30  recreation_client_init INFO     Trying URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_regression.php.
+09/30/2014 13:17:32  recreation_client_init INFO     Read data for regression computation.
+09/30/2014 13:17:32  recreation_client_init INFO     Calculations use mean annual photo-user-days from 2005-2012.
+09/30/2014 13:17:32  recreation_client_init INFO     Calculated photo-user-days.
+09/30/2014 13:17:32  recreation_client_init INFO     Performed linear regression.
+09/30/2014 13:17:32  recreation_client_init INFO     Wrote regression statistics.
+09/30/2014 13:17:32  recreation_client_init INFO     Trying URL: http://ncp-skookum.stanford.edu/~recreation/recreation_server_results.php.
+09/30/2014 13:17:32  recreation_client_init INFO     URL: http://ncp-skookum.stanford.edu/~recreation//data//nklgq65to6t1dh7eer264b6lu1/results.zip.
+09/30/2014 13:17:32  recreation_client_init INFO     Transaction complete
+09/30/2014 13:17:32  root               INFO     Opening file explorer to workspace directory
+09/30/2014 13:17:32  root               INFO     Using windows explorer to view files
+09/30/2014 13:17:33  root               INFO     Disk space free: 193.72 GB
+09/30/2014 13:17:33  root               INFO     Elapsed time: 6m 8.88s
+09/30/2014 13:17:33  root               INFO     Finished.
+09/30/2014 13:17:33  root               INFO     Elapsed time: 6m 9.29s
+09/30/2014 13:17:33  root               INFO     Operations completed successfully
