@@ -82,7 +82,7 @@ shinyUI(#fluidPage(
                           ),
                         mainPanel(
                           uiOutput("diffnames"),
-                          tags$head(tags$script(src="leafletbug_fix.js")),
+                          #tags$head(tags$script(src="leafletbug_fix.js")),
                           chartOutput("Rleafmap2", 'leaflet'),
                           p(strong("BLUE"), "represents a", strong("less vulnerable"), "coastline under the scenario, compared to the baseline."),
                           p(strong('RED'), "represents a", strong("more vulnerable"), "coastline under the scenario, compared to the baseline."),
