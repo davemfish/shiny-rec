@@ -79,6 +79,7 @@ shinyServer(function(input, output, session) {
       return(NULL)
     
     init <- getLog(input$log$datapath)
+    ## insert system call here
     print(init[["sessid"]])
     return(init)  
   })
@@ -89,6 +90,7 @@ shinyServer(function(input, output, session) {
       
     base <- getLog(input$base$datapath)
     scen <- getLog(input$scen$datapath)
+    ## insert system calls here
     print(base[["sessid"]])
     return(list(base=base, scen=scen))
   })
