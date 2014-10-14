@@ -50,8 +50,6 @@ print("start function")
 
 
 
-## Its called inside LoadONE() OR LoadTWO() - comparison
-
 
 L0 <- Leaflet$new()
 L0$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
@@ -62,6 +60,15 @@ recTemplate <- "<script>
                 new L.Control.Zoom({ position: 'topright' }).addTo(map);
                 </script>"
 L0$setTemplate(afterScript = recTemplate)
+
+## COMP: 
+## Initialize 2nd leaflet map
+L2 <- Leaflet$new()
+L2$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
+L2$setView(c(0, 0), 1)  
+L2$set(width = 550, height = 450)
+L2$mapOpts(zoomControl=FALSE) 
+L2$setTemplate(afterScript = recTemplate)
 
 ###### Server Function ##############
 shinyServer(function(input, output, session) {
@@ -139,8 +146,6 @@ output$diffnames <- renderUI({
     isolate({
       df.base <- LoadSpace2()[["basedata"]]
       df.scen <- LoadSpace2()[["scendata"]]
-      print(dim(df.base))
-      print(class(df.base))
       
       baseline <- df.base[ ,input$fieldnames]
       scenario <- df.scen[ ,input$fieldnames]
@@ -148,20 +153,14 @@ output$diffnames <- renderUI({
       
 #      diff <- df.scen[ ,input$fieldnames] - df.base[ ,input$fieldnames]
 
-      print(class(diff))
-      print(length(diff))
       diff <- data.frame(cbind(df.base[ ,c("cellID")], diff))
-      print("after cbind")
-      print(class(diff))
-      print(dim(diff))
+
       names(diff) <- c("cellID", "delta")
 #       diff$baseline <- df.base[ ,input$fieldnames]
 #       diff$scenario <- df.scen[ ,input$fieldnames]
       diff$baseline <- baseline
       diff$scenario <- scenario
-      print("diff summ")
-      print(class(diff))
-      print(dim(diff))
+
     })
     return(diff)
   })
@@ -374,12 +373,7 @@ output$diffnames <- renderUI({
 #   })
   
   
-  ## COMP: 
-  ## Initialize 2nd leaflet map
-  L2 <- Leaflet$new()
-  #L1$addAssets(jshead = "https://github.com/turban/Leaflet.Sync/blob/master/L.Map.Sync.js")
-  L2$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
-  L2$set(width = 550, height = 450)  
+
   
   ## COMP:
   ## def function for assigning color to map variable, which is the differenced value
@@ -393,12 +387,35 @@ output$diffnames <- renderUI({
     isolate({
       diff <- Difference()
       diff$delta[is.infinite(diff$delta)] <- NA
+      print(summary(diff$delta))
       brks <- as.numeric(cut(diff$delta, breaks=c(min(diff$delta), 0 - sd(diff$delta), -0.0001, 0.0001, 0 + sd(diff$delta), max(diff$delta)), labels=F))
     })
     print("Diff info")
     cols <- as.list(brewer.pal(5, "RdBu")[as.numeric(brks)])
     #cols <- c(rgb(0,0,1), rgb(1,1,1), rgb(1,0,0))[colbrks]
-    return(cols)
+    brks.list <- Cut2Num(brks)
+    num.brks <- brks.list[["brks"]]
+    legbrks <- round(num.brks, digits=3)
+  
+    #legbrks[1] <- 0
+    ids <- brks.list[["ids"]]
+    ids <- ids[order(ids)]
+    ids <- c(1, ids+1)
+    legbrks <- legbrks[ids]
+    
+    leglabs <- list()
+    for (i in 1:length(legbrks)){
+      if (i == 1) { 
+        leglabs[[i]] <- legbrks[i] 
+      } else {
+        leglabs[[i]] <- paste(legbrks[i-1], "-", legbrks[i])
+      }
+    }
+    
+    legcols <- c(brewer.pal(5, "RdBu"))[ids]
+    
+    
+    return(list(cols=cols, legcols=legcols, leglabs=leglabs))
   })
   
   ## COMP:
@@ -428,7 +445,8 @@ output$diffnames <- renderUI({
 #       x$popup <- hwrite(mat)
 #       return(x)
 #     })
-    cols <- getCol2()
+    style <- getCol2()
+    cols <- style[["cols"]]
     for (i in 1:length(grid[[2]])){
       x <- grid[[2]][[i]]
       x$delta <- df.diff[i,"delta"]
@@ -465,7 +483,10 @@ output$diffnames <- renderUI({
             };
            } !#"
     )
-
+    
+    legcols <- style[["legcols"]]
+    leglabs <- style[["leglabs"]]
+    L2$legend(position="bottomleft", colors=legcols, labels=leglabs)
     L2$setView(view[["center"]], view[["zoom"]])
     return(L2)
     })
@@ -489,14 +510,14 @@ output$diffnames <- renderUI({
   #     return(df.diff)
   #   })
   
-  output$Rleafmap2 <- renderMap({
-    if (input$Difference == 0){
-      L01 <- Leaflet$new()
-      L01$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
-      L01$setView(c(0, 0), 1)  
-      L01$set(width = 550, height = 450) 
-      return(L01)
-    }
+  output$Rleafmap2 <- renderMap2({
+    print(str(L2))
+    if (input$Difference == 0) 
+      return(L2)
+    if (is.null(input$fieldnames))
+      return(L2)
+    if (input$fieldnames == "")
+      return(L2)
     plotMap2()
   })
   
