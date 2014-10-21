@@ -17,7 +17,7 @@ getSpace <- function(x, two=FALSE){ # x is the session ID
   geom <- fromJSON(file.path(ws, "invest_outputs_geojson", paste(x, ".geojson", sep="")))
   
   ### get bbox out of geojson geometry
-  coords <- lapply(geom[[2]], FUN=function(x){
+  coords <- lapply(geom[[3]], FUN=function(x){
     return(matrix(unlist(x$geometry$coordinates), ncol=2, byrow=T))
   })
   coordmat <- do.call("rbind", coords)

@@ -53,6 +53,7 @@ print("start function")
 
 L0 <- Leaflet$new()
 L0$tileLayer("https://a.tiles.mapbox.com/v3/geointerest.map-dqz2pa8r/{z}/{x}/{y}.png")
+#L0$tileLayer(provider = 'Stamen.TonerLite')
 L0$setView(c(0, 0), 1)  
 L0$set(width = 550, height = 450)
 L0$mapOpts(zoomControl=FALSE) 
@@ -291,8 +292,8 @@ output$diffnames <- renderUI({
 #       x$
 #       return(x)
 #     })
-    for (i in 1:length(grid[[2]])){
-      x <- grid[[2]][[i]]
+    for (i in 1:length(grid[[3]])){
+      x <- grid[[3]][[i]]
       y <- cols[[i]]
       mat <- as.matrix(unlist(x))
       #   mat <- as.matrix(mat[(grep("bbox*", rownames(mat))*-1),])
@@ -308,7 +309,7 @@ output$diffnames <- renderUI({
       } else {
         x$col <- y
       }
-      grid[[2]][[i]] <- x
+      grid[[3]][[i]] <- x
     }
 
     L0$geoJson(grid, 
@@ -449,8 +450,8 @@ output$diffnames <- renderUI({
 #     })
     style <- getCol2()
     cols <- style[["cols"]]
-    for (i in 1:length(grid[[2]])){
-      x <- grid[[2]][[i]]
+    for (i in 1:length(grid[[3]])){
+      x <- grid[[3]][[i]]
       x$delta <- df.diff[i,"delta"]
       y <- cols[[i]]
       mat <- as.matrix(unlist(x))
@@ -468,7 +469,7 @@ output$diffnames <- renderUI({
 #         x$col <- y
 #       }
       x$col <- y
-      grid[[2]][[i]] <- x
+      grid[[3]][[i]] <- x
     }
     
     L2$geoJson(grid, 
