@@ -13,7 +13,7 @@ getLog <- function(x){
 getSpace <- function(x, two=FALSE){ # x is the session ID
   ws <- "/srv/shiny-server/shiny-rec/data"
   #unzip(Sys.glob(file.path(ws, "results*.zip")), exdir=ws, overwrite=T)
-  atts <- read.dbf(file.path(ws, "invest_outputs", x, "public_grid.dbf"))
+  atts <- read.dbf(file.path(ws, "invest_outputs", x, "grid_public.dbf"))
   geom <- fromJSON(file.path(ws, "invest_outputs_geojson", paste(x, ".geojson", sep="")))
   
   ### get bbox out of geojson geometry
