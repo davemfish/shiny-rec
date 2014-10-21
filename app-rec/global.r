@@ -1,3 +1,5 @@
+library(foreign)
+
 getLog <- function(x){
   logfile <- readLines(con=file.path(x), n=-1)
   blanks <- which(logfile=="")
@@ -9,10 +11,10 @@ getLog <- function(x){
 }
 
 getSpace <- function(x, two=FALSE){ # x is the session ID
-  ws <- file.path("http://ncp-skookum.stanford.edu/~woodsp", x)
+  ws <- "/srv/shiny-server/shiny-rec/data"
   #unzip(Sys.glob(file.path(ws, "results*.zip")), exdir=ws, overwrite=T)
-  atts <- read.csv(file.path(ws, "grid.csv"))
-  geom <- fromJSON(file.path(ws, "grid.geojson"))
+  atts <- read.dbf(file.path(ws, "invest_outputs", x, "public_grid.dbf"))
+  geom <- fromJSON(file.path(ws, "invest_outputs_geojson", paste(x, ".geojson", sep="")))
   
   ### get bbox out of geojson geometry
   coords <- lapply(geom[[2]], FUN=function(x){
